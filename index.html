@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Plant Pet 🌱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .plant-container {
+            text-align: center;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .plant-stage {
+            display: none;
+            font-size: 120px;
+            animation: grow 0.5s ease-in-out;
+        }
+
+        .plant-stage.active {
+            display: block;
+        }
+
+        @keyframes grow {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .accessories {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 60px;
+            z-index: 10;
+        }
+
+        .pot {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 80px;
+        }
+
+        .plant-name {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .status-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .moisture-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .moisture-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .moisture-status {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        .status-icon {
+            font-size: 3em;
+            margin: 10px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .connect-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .connect-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .connect-btn.connected {
+            background: #2196F3;
+        }
+
+        .connect-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .customization {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .custom-section {
+            text-align: center;
+        }
+
+        .custom-section h3 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .custom-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .custom-btn {
+            padding: 10px 15px;
+            font-size: 1.5em;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .custom-btn:hover {
+            background: #667eea;
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .custom-btn.selected {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            height: 200px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .log-container {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            padding: 8px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌱 Virtual Plant Pet</h1>
+            <p>Keep your real plant healthy to grow your virtual buddy!</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Plant Display -->
+            <div class="card plant-container">
+                <div class="accessories" id="accessory">🎩</div>
+                <div class="plant-stage active" id="stage0">🌱</div>
+                <div class="plant-stage" id="stage1">🌿</div>
+                <div class="plant-stage" id="stage2">🪴</div>
+                <div class="plant-stage" id="stage3">🌳</div>
+                <div class="plant-stage" id="stage4">🌺</div>
+                <div class="pot" id="pot">🪴</div>
+                <div class="plant-name" id="plantName">Buddy</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="growthProgress">0%</div>
+                </div>
+            </div>
+
+            <!-- Status Panel -->
+            <div class="card status-panel">
+                <h2>📊 Plant Status</h2>
+                <div class="moisture-display">
+                    <div>Current Moisture Level</div>
+                    <div class="moisture-value" id="moistureValue">---</div>
+                    <div class="status-icon" id="statusIcon">😊</div>
+                    <div class="moisture-status" id="moistureStatus">Waiting for data...</div>
+                </div>
+
+                <button class="connect-btn" id="connectBtn">🔌 Connect Micro:bit</button>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="streak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalReadings">0</div>
+                        <div class="stat-label">Total Readings</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="healthScore">100</div>
+                        <div class="stat-label">Health Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customization -->
+        <div class="card">
+            <h2>🎨 Customize Your Plant</h2>
+            <div class="customization">
+                <div class="custom-section">
+                    <h3>Accessories</h3>
+                    <div class="custom-options">
+                        <button class="custom-btn selected" onclick="changeAccessory('🎩')">🎩</button>
+                        <button class="custom-btn" onclick="changeAccessory('👑')">👑</button>
+                        <button class="custom-btn" onclick="changeAccessory('🎀')">🎀</button>
+                        <button class="custom-btn" onclick="changeAccessory('🧢')">🧢</button>
+                        <button class="custom-btn" onclick="changeAccessory('🌟')">🌟</button>
+                        <button class="custom-btn" onclick="changeAccessory('')">None</button>
+                    </div>
+                </div>
+                <div class="custom-section">
+                    <h3>Pot Style</h3>
+                    <div class="custom-options">
+                        <button class="custom-btn selected" onclick="changePot('🪴')">🪴</button>
+                        <button class="custom-btn" onclick="changePot('🏺')">🏺</button>
+                        <button class="custom-btn" onclick="changePot('🎁')">🎁</button>
+                        <button class="custom-btn" onclick="changePot('🪣')">🪣</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Log -->
+        <div class="card">
+            <h2>📜 Activity Log</h2>
+            <div class="log-container" id="logContainer">
+                <div class="log-entry">Waiting for first reading...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <h3 id="notifTitle">🚨 Alert</h3>
+        <p id="notifMessage">Your plant needs water!</p>
+    </div>
+
+    <script>
+        // State management
+        let plantData = {
+            moisture: 0,
+            stage: 0,
+            streak: 0,
+            totalReadings: 0,
+            healthScore: 100,
+            lastReading: null,
+            accessory: '🎩',
+            pot: '🪴',
+            name: 'Buddy',
+            history: []
+        };
+
+        let port = null;
+        let reader = null;
+        let isConnected = false;
+
+        // Load saved data
+        function loadData() {
+            const saved = localStorage.getItem('plantPetData');
+            if (saved) {
+                plantData = { ...plantData, ...JSON.parse(saved) };
+                updateUI();
+            }
+        }
+
+        // Save data
+        function saveData() {
+            localStorage.setItem('plantPetData', JSON.stringify(plantData));
+        }
+
+        // Connect to Micro:bit via WebUSB Serial
+        async function connectMicrobit() {
+            try {
+                const connectBtn = document.getElementById('connectBtn');
+                
+                if (!navigator.serial) {
+                    alert('Web Serial API not supported. Please use Chrome or Edge browser.');
+                    return;
+                }
+
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                
+                isConnected = true;
+                connectBtn.textContent = '✅ Connected';
+                connectBtn.classList.add('connected');
+                
+                addLog('✅ Connected to Micro:bit');
+                readSerialData();
+            } catch (error) {
+                console.error('Connection error:', error);
+                addLog('❌ Connection failed: ' + error.message);
+            }
+        }
+
+        // Read serial data from Micro:bit
+        async function readSerialData() {
+            const textDecoder = new TextDecoderStream();
+            const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+            reader = textDecoder.readable.getReader();
+
+            let buffer = '';
+            
+            try {
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += value;
+                    
+                    // Look for moisture values (numbers between 0-1023)
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+                    
+                    for (const line of lines) {
+                        const match = line.match(/\d+/);
+                        if (match) {
+                            const moisture = parseInt(match[0]);
+                            if (moisture >= 0 && moisture <= 1023) {
+                                updateMoisture(moisture);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Read error:', error);
+                addLog('❌ Read error: ' + error.message);
+            }
+        }
+
+        // Update moisture reading
+        function updateMoisture(value) {
+            plantData.moisture = value;
+            plantData.totalReadings++;
+            plantData.lastReading = new Date().toISOString();
+            
+            // Add to history
+            plantData.history.push({
+                timestamp: Date.now(),
+                moisture: value
+            });
+            
+            // Keep only last 100 readings
+            if (plantData.history.length > 100) {
+                plantData.history.shift();
+            }
+            
+            // Update health score
+            updateHealthScore(value);
+            
+            // Check for growth
+            checkGrowth();
+            
+            // Update UI
+            updateUI();
+            
+            // Save data
+            saveData();
+            
+            // Add log entry
+            addLog(`💧 Moisture reading: ${value} - ${getMoistureStatus(value)}`);
+        }
+
+        // Get moisture status
+        function getMoistureStatus(value) {
+            if (value <= 300) return '☠️ Critical - Plant dying!';
+            if (value <= 600) return '😊 Healthy - Plant happy!';
+            return '🚫 Too wet - Reduce watering!';
+        }
+
+        // Update health score
+        function updateHealthScore(moisture) {
+            if (moisture > 300 && moisture <= 600) {
+                plantData.healthScore = Math.min(100, plantData.healthScore + 1);
+                plantData.streak++;
+            } else {
+                plantData.healthScore = Math.max(0, plantData.healthScore - 5);
+                if (moisture <= 300) {
+                    showNotification('🚨 Critical Alert', 'Your plant is dying! Water immediately!');
+                }
+            }
+        }
+
+        // Check for plant growth
+        function checkGrowth() {
+            const newStage = Math.floor(plantData.streak / 5);
+            if (newStage > plantData.stage && newStage <= 4) {
+                plantData.stage = newStage;
+                showNotification('🎉 Plant Grew!', `Your plant reached stage ${newStage + 1}!`);
+            }
+        }
+
+        // Update UI
+        function updateUI() {
+            // Moisture display
+            document.getElementById('moistureValue').textContent = plantData.moisture || '---';
+            document.getElementById('moistureStatus').textContent = 
+                plantData.moisture ? getMoistureStatus(plantData.moisture) : 'Waiting for data...';
+            
+            // Status icon
+            const icon = document.getElementById('statusIcon');
+            if (plantData.moisture <= 300) icon.textContent = '☠️';
+            else if (plantData.moisture <= 600) icon.textContent = '😊';
+            else icon.textContent = '🚫';
+            
+            // Stats
+            document.getElementById('streak').textContent = plantData.streak;
+            document.getElementById('totalReadings').textContent = plantData.totalReadings;
+            document.getElementById('healthScore').textContent = plantData.healthScore;
+            
+            // Growth progress
+            const progress = (plantData.streak % 5) * 20;
+            document.getElementById('growthProgress').style.width = progress + '%';
+            document.getElementById('growthProgress').textContent = progress + '%';
+            
+            // Plant stage
+            for (let i = 0; i <= 4; i++) {
+                document.getElementById(`stage${i}`).classList.remove('active');
+            }
+            document.getElementById(`stage${plantData.stage}`).classList.add('active');
+            
+            // Customization
+            document.getElementById('accessory').textContent = plantData.accessory;
+            document.getElementById('pot').textContent = plantData.pot;
+            document.getElementById('plantName').textContent = plantData.name;
+        }
+
+        // Customization functions
+        function changeAccessory(emoji) {
+            plantData.accessory = emoji;
+            updateUI();
+            saveData();
+            
+            // Update button selection
+            document.querySelectorAll('.custom-section:first-child .custom-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function changePot(emoji) {
+            plantData.pot = emoji;
+            updateUI();
+            saveData();
+            
+            // Update button selection
+            document.querySelectorAll('.custom-section:last-child .custom-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        // Notification system
+        function showNotification(title, message) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notifTitle').textContent = title;
+            document.getElementById('notifMessage').textContent = message;
+            notif.classList.add('show');
+            
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 5000);
+            
+            // Browser notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, { body: message });
+            }
+        }
+
+        // Add log entry
+        function addLog(message) {
+            const logContainer = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logContainer.insertBefore(entry, logContainer.firstChild);
+            
+            // Keep only last 20 entries
+            while (logContainer.children.length > 20) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        // Event listeners
+        document.getElementById('connectBtn').addEventListener('click', connectMicrobit);
+
+        // Simulate data for testing (remove when connecting real Micro:bit)
+        function simulateData() {
+            if (!isConnected) {
+                const testMoisture = Math.floor(Math.random() * 700) + 200;
+                updateMoisture(testMoisture);
+            }
+        }
+
+        // Initialize
+        loadData();
+        updateUI();
+        
+        // Uncomment next line to test without Micro:bit (generates random data every 5 seconds)
+        // setInterval(simulateData, 5000);
+    </script>
+</body>
+</html>
